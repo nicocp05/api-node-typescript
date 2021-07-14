@@ -13,6 +13,7 @@ export const getUsers = async ( req: Request, res: Response ) => {
         UserModel.find({status: true})
             .skip(Number(offset))
             .limit(Number(limit))
+            .select('-password')
     ]);
 
     res.json({
@@ -50,7 +51,8 @@ export const updateUser = async ( req: Request, res: Response ) => {
 
     }
 
-    const user = await UserModel.findByIdAndUpdate( id, rest );
+    const user = await UserModel.findByIdAndUpdate( id, rest )
+        .select('-password');
 
     res.json({
         user
@@ -62,12 +64,13 @@ export const deleteUser = async ( req: Request, res: Response ) => {
 
     const { id } = req.params;
 
-    // const user = await UserModel.findByIdAndDelete( id );
-
-    const user = await UserModel.findByIdAndUpdate( id, { status: false }, { new: true } );
+    const user = await UserModel.findByIdAndUpdate( id, { status: false }, { new: true } )
+        .select('-password');
+    
+    const userAuth = req.params.user;
     
     res.json({
-        user  
+        user, userAuth
     });
 
 }
